@@ -33,7 +33,7 @@
 # RUN NODE_OPTIONS=--max_old_space_size=4096 npm run build
 
 # Stage 2: the production environment
-FROM nginxinc/nginx-unprivileged:1.21-alpine
+FROM nginxinc/nginx-unprivileged:2.5
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 #COPY  --from=react-build /frontend/build /usr/share/nginx/html
