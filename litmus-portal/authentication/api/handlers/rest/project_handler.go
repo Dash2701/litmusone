@@ -8,6 +8,7 @@ import (
 	"litmus/litmus-portal/authentication/pkg/utils"
 	"litmus/litmus-portal/authentication/pkg/validations"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -16,6 +17,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -573,7 +575,7 @@ func RemoveInvitation(service services.ApplicationService) gin.HandlerFunc {
 	}
 }
 
-//  UpdateProjectName is used to update a project's name
+// UpdateProjectName is used to update a project's name
 func UpdateProjectName(service services.ApplicationService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var userRequest entities.ProjectInput
@@ -665,5 +667,42 @@ func GetProjectRole(service services.ApplicationService) gin.HandlerFunc {
 			"role": role,
 		})
 
+	}
+}
+
+// DASH : To add user to a defualt project
+func AddToDefaultProject(service services.ApplicationService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var member entities.CreateProjectInput
+		err := c.BindJSON(&member)
+		if err != nil {
+			log.Warn(err)
+			c.JSON(utils.ErrorStatusCodes[utils.ErrInvalidRequest], presenter.CreateErrorResponse(utils.ErrInvalidRequest))
+			return
+		}
+
+		user, err := service.GetUser(member.UserID)
+		if err != nil {
+			log.Error(err)
+			c.JSON(utils.ErrorStatusCodes[utils.ErrServerError], presenter.CreateErrorResponse(utils.ErrServerError))
+			return
+		}
+
+		newMember := &entities.Member{
+			UserID:     user.ID,
+			Role:       "Owner",
+			Invitation: "Accepted",
+			JoinedAt:   strconv.FormatInt(time.Now().Unix(), 10),
+		}
+		projectId := os.Getenv("DEFAULT_PROJECT_ID")
+		err = service.AddMember(projectId, newMember)
+		if err != nil {
+			logrus.Info(err)
+			c.JSON(utils.ErrorStatusCodes[utils.ErrServerError], presenter.CreateErrorResponse(utils.ErrServerError))
+			return
+		}
+		logrus.Info("Added the user to default")
+
+		c.JSON(200, gin.H{"data": "successful"})
 	}
 }
