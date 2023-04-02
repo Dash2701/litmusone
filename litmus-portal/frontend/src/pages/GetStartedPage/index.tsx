@@ -162,8 +162,10 @@ const GetStarted: React.FC = () => {
 
   return (
     <LoginWrapper
-      title={t('getStarted.password.info')}
-      subtitle={t('getStarted.password.desc')}
+      title="Welcome to Flipkart Litmus Chaos"
+      subtitle="You will be added now as a owner in default project, but please note you won't be able to run any chaos scenarios there. 
+      Ask your Project Owner to extend an Invite to you.
+      If you want to become a Project owner, then contact Central-SRE"
     >
       <form
         id="login-form"
@@ -174,7 +176,7 @@ const GetStarted: React.FC = () => {
           }
         }}
       >
-        <InputField
+        {/* <InputField
           data-cy="inputPassword"
           className={classes.inputValue}
           label={t('getStarted.password.label')}
@@ -188,8 +190,8 @@ const GetStarted: React.FC = () => {
               confirmPassword: values.confirmPassword,
             });
           }}
-        />
-        <InputField
+        /> */}
+        {/* <InputField
           data-cy="confirmInputPassword"
           className={classes.inputValue}
           label={t('getStarted.password.cnfLabel')}
@@ -208,9 +210,9 @@ const GetStarted: React.FC = () => {
               confirmPassword: event.target.value,
             })
           }
-        />
+        /> */}
         <div className={classes.buttonGroup}>
-          <div data-cy="skipButton">
+          {/* <div data-cy="skipButton">
             <TextButton
               className={classes.skipButton}
               title="Skip for now"
@@ -228,17 +230,22 @@ const GetStarted: React.FC = () => {
                 <Typography>{t('getStarted.button.skip')}</Typography>
               )}
             </TextButton>
-          </div>
+          </div> */}
           <div data-cy="finishButton">
             <ButtonFilled
-              className={classes.submitButton}
-              type="submit"
-              disabled={isError.current}
+              className={classes.skipButton}
+              title="Enter to Chaos Tool Now"
+              onClick={() => {
+                if (ValidateUser()) {
+                  setIsLoading(true);
+                  addToDefaultProject();
+                }
+              }}
             >
               {loading ? (
                 <Loader size={loaderSize} />
               ) : (
-                <>{t('getStarted.button.finish')}</>
+                <>Enter Here</>
               )}
             </ButtonFilled>
           </div>
