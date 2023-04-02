@@ -100,6 +100,34 @@ const GetStarted: React.FC = () => {
       });
   };
 
+
+  //Dash
+  const addToDefaultProject = () => {
+    fetch(`${config.auth.url}/add_default_member`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify({
+        project_name: `${getUsername()}'s project`,
+        user_id: getUserId(),
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if ('error' in data) {
+          console.error(data);
+        } else {
+          window.location.assign(`${process.env.PUBLIC_URL}/home`);
+        }
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
   // Submit entered data to /update/details endpoint
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -121,7 +149,7 @@ const GetStarted: React.FC = () => {
         if ('error' in data) {
           isError.current = true;
         } else {
-          createProject();
+          addToDefaultProject();
         }
       })
       .catch((err) => {
@@ -190,7 +218,7 @@ const GetStarted: React.FC = () => {
               onClick={() => {
                 if (ValidateUser()) {
                   setIsLoading(true);
-                  createProject();
+                  addToDefaultProject();
                 }
               }}
             >
