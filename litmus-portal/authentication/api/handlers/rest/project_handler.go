@@ -690,7 +690,7 @@ func AddToDefaultProject(service services.ApplicationService) gin.HandlerFunc {
 
 		newMember := &entities.Member{
 			UserID:     user.ID,
-			Role:       "Owner",
+			Role:       "Viewer",
 			Invitation: "Accepted",
 			JoinedAt:   strconv.FormatInt(time.Now().Unix(), 10),
 		}

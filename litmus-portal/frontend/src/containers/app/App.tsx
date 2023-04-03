@@ -77,9 +77,39 @@ const Routes: React.FC = () => {
       });
   };
 
+  // DASH
+  const getDefaultProjects = () => {
+    setLoading(true);
+    fetch(`${config.auth.url}/list_projects`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.data) {
+          setprojectID(data.data[0]);    
+          setprojectRole('Viewer');      
+          history.push({
+            pathname: `/${baseRoute}`,
+            search: `?projectID=${data.data[0]}&projectRole=Viewer`,
+          });
+        }
+
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
+  };
+
   useEffect(() => {
     if (!((projectID !== '' && projectID !== undefined) || getToken() === '')) {
-      getOwnerProjects();
+      //getOwnerProjects();
+      getDefaultProjects();
     }
   }, [projectID]);
 
