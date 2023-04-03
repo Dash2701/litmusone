@@ -129,10 +129,11 @@ const PersonalDetails: React.FC = () => {
               handleEmailChange={handleEmailChange}
               userValue={personaData?.userName}
               handleUserChange={handleUserChange}
-              isNameDisabled={false}
-              isEmailDisabled={false}
+              //DASH
+              isNameDisabled
+              isEmailDisabled
             />
-            <div className={classes.saveButton}>
+            {/* <div className={classes.saveButton}>
               <div data-cy="save">
                 <ButtonFilled
                   disabled={!(personaData?.fullName?.length && !loading)}
@@ -223,7 +224,7 @@ const PersonalDetails: React.FC = () => {
                   </div>
                 )}
               </Modal>
-            </div>
+            </div> */}
           </form>
         </>
       )}
