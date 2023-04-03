@@ -245,14 +245,17 @@ const Invite: React.FC<InviteProps> = ({ handleModal }) => {
                   <img src="./icons/checkmark.svg" alt="checkmark" />
                   <div className={classes.text}>
                     <Typography className={classes.typo}>
+                      {t('settings.teamingTab.inviteNew.invite.successHeader')}{' '}
                       <strong>
-                        {"Member Added"}
+                        {t(
+                          'settings.teamingTab.inviteNew.invite.successHeaderStrong'
+                        )}
                       </strong>
                     </Typography>
                   </div>
                   <div className={classes.textSecond}>
                     <Typography className={classes.typoSub}>
-                      {}
+                      {t('settings.teamingTab.inviteNew.invite.info')}
                     </Typography>
                   </div>
                   <div
@@ -273,7 +276,10 @@ const Invite: React.FC<InviteProps> = ({ handleModal }) => {
       ) : (
         <div>
           <Typography className={classes.Header}>
-              {"Add a new Member"}
+            {t('settings.teamingTab.inviteNew.invite.header')}{' '}
+            <strong>
+              {t('settings.teamingTab.inviteNew.invite.headerStrong')}
+            </strong>
           </Typography>
           <Toolbar className={classes.toolbar}>
             <div
@@ -283,7 +289,9 @@ const Invite: React.FC<InviteProps> = ({ handleModal }) => {
               <div>
                 <Input
                   id="input-with-icon-textfield"
-                  placeholder={"Search Member"}
+                  placeholder={t(
+                    'settings.teamingTab.inviteNew.invite.label.someone'
+                  )}
                   onChange={(e) => {
                     setFilters({
                       search: e.target.value,
@@ -317,7 +325,7 @@ const Invite: React.FC<InviteProps> = ({ handleModal }) => {
                   }}
                 >
                   <div>
-                    {"Add Member"}
+                    {t('settings.teamingTab.inviteNew.invite.button.send')}
                   </div>
                 </ButtonFilled>
               </div>

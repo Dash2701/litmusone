@@ -258,7 +258,7 @@ const Routes: React.FC = () => {
                 path="/myhub/:hubname/:chart/:experiment"
                 component={MyHubExperiment}
               />
-              {projectRole === 'Owner' || projectRole === 'Editor' || projectRole === 'Viewer'? (
+              {(projectRole === 'Owner' || projectRole === 'Viewer' || projectRole === 'Editor')? (
                 <Route path="/settings" component={Settings} />
               ) : (
                 <Redirect
