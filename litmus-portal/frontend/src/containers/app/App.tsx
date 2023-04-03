@@ -258,6 +258,7 @@ const Routes: React.FC = () => {
                 path="/myhub/:hubname/:chart/:experiment"
                 component={MyHubExperiment}
               />
+              {/* DASH */}
               {(projectRole === 'Owner' || projectRole === 'Viewer' || projectRole === 'Editor')? (
                 <Route path="/settings" component={Settings} />
               ) : (
