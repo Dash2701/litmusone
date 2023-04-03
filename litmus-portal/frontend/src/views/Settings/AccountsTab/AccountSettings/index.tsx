@@ -119,11 +119,11 @@ const AccountSettings: React.FC = () => {
 
       {/* Displays the lower segment containing the password details */}
       <Typography className={classes.headerText}>
-        <strong>{t('settings.accountsTab.accountsSettings.header')}</strong>
+        <strong>{"For any change in user information, please contact administrator"}</strong>
       </Typography>
       <div className={classes.outerPass}>
-        <form className={classes.innerPass}>
-          {/* Current Password */}
+        {/* <form className={classes.innerPass}>
+           Current Password }
           <div data-cy="currPassword">
             <InputField
               required
@@ -136,7 +136,7 @@ const AccountSettings: React.FC = () => {
               variant="primary"
             />
           </div>
-          {/* New Password */}
+          {New Password }
           <div style={{ marginTop: '1rem' }} />
           <div data-cy="newPassword">
             <InputField
@@ -163,7 +163,7 @@ const AccountSettings: React.FC = () => {
               value={password.newPassword}
             />
           </div>
-          {/* Confirm new password */}
+          {/* Confirm new password }
           <div style={{ marginTop: '1rem' }} />
           <div data-cy="confPassword">
             <InputField
@@ -282,7 +282,7 @@ const AccountSettings: React.FC = () => {
               </div>
             )}
           </Modal>
-        </form>
+        </form> */}
         <div className={classes.col2}>
           <img src="./icons/pass.svg" data-cy="lock" alt="lockIcon" />
           {/*  <Typography className={classes.txt1}>
