@@ -109,7 +109,7 @@ const Routes: React.FC = () => {
   useEffect(() => {
     if (!((projectID !== '' && projectID !== undefined) || getToken() === '')) {
       //getOwnerProjects();
-      getDefaultProjects();
+       getDefaultProjects();
     }
   }, [projectID]);
 
@@ -258,7 +258,7 @@ const Routes: React.FC = () => {
                 path="/myhub/:hubname/:chart/:experiment"
                 component={MyHubExperiment}
               />
-              {projectRole === 'Owner' ? (
+              {projectRole === 'Owner' || projectRole === 'Editor' || projectRole === 'Viewer'? (
                 <Route path="/settings" component={Settings} />
               ) : (
                 <Redirect

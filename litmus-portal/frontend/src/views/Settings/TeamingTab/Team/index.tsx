@@ -315,7 +315,7 @@ const TeamingTab: React.FC = () => {
                     {projectOtherCount}
                   </Typography>
                   <Typography>
-                    {t('settings.teamingTab.projectInvite')}
+                    {"Projects you were added"}
                   </Typography>
                 </div>
               </div>
@@ -334,10 +334,10 @@ const TeamingTab: React.FC = () => {
                   className={classes.invitationButton}
                 >
                   <div className={classes.invitationButtonFlex}>
-                    {t('settings.teamingTab.invitations')}
-                    <Typography data-cy="invitationsCount">
+                    {"Create Project"}
+                    {/* <Typography data-cy="invitationsCount">
                       {invitationsCount}
-                    </Typography>
+                    </Typography> */}
                   </div>
                 </ButtonOutlined>
               </div>
@@ -461,7 +461,7 @@ const TeamingTab: React.FC = () => {
                     }
                     {...tabProps(0)}
                   />
-                  <Tab
+                  {/* <Tab
                     data-cy="invitedTab"
                     label={
                       <span
@@ -476,7 +476,7 @@ const TeamingTab: React.FC = () => {
                       </span>
                     }
                     {...tabProps(1)}
-                  />
+                  /> */}
                 </Tabs>
               </Paper>
               <TabPanel value={activeTab} index={0}>
@@ -490,7 +490,7 @@ const TeamingTab: React.FC = () => {
                   open={deleteMemberOpen}
                 />
               </TabPanel>
-              <TabPanel value={activeTab} index={1}>
+              {/* <TabPanel value={activeTab} index={1}>
                 <InvitedTable
                   fetchData={getProjectDetails}
                   notAcceptedFilteredData={notAcceptedFilteredData}
@@ -498,19 +498,17 @@ const TeamingTab: React.FC = () => {
                     showModal();
                   }}
                 />
-              </TabPanel>
+              </TabPanel> */}
               {/* user table */}
             </div>
           </div>
           <div>
             <Paper ref={scrollToRef} className={classes.invitations}>
               <Typography className={classes.inviteHeading}>
-                {t('settings.teamingTab.invitedProject')}
+                {"Project List"}
               </Typography>
               <Typography className={classes.inviteText}>
-                {t(
-                  'settings.teamingTab.invitation.receivedInvitation.receivedHeading'
-                )}
+                {"You can select your project from the dropdown on top ri"}
               </Typography>
               <Invitation getProjectDetail={getProjectDetail} />
             </Paper>

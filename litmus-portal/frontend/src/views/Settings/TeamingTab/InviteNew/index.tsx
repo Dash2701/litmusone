@@ -1,7 +1,9 @@
+import { Tooltip } from '@material-ui/core';
 import { IconButton } from '@material-ui/core';
 import { ButtonFilled, Modal } from 'litmus-ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { getProjectID, getProjectRole } from '../../../../utils/getSearchParams';
 import Invite from './Invite';
 import useStyles from './styles';
 
@@ -11,6 +13,8 @@ interface InviteNewProps {
   handleOpen: () => void;
   open: boolean;
 }
+
+
 const InviteNew: React.FC<InviteNewProps> = ({
   showModal,
   handleOpen,
@@ -18,12 +22,15 @@ const InviteNew: React.FC<InviteNewProps> = ({
 }) => {
   const classes = useStyles();
   const { t } = useTranslation();
+  const userRole = getProjectRole();
 
   return (
     <div data-cy="inviteNewMemberButton">
       <div className={classes.button}>
-        <ButtonFilled onClick={handleOpen}>
-          <div>{t('settings.teamingTab.inviteNew.header')}</div>
+        <ButtonFilled 
+          onClick={handleOpen}
+          >
+          <div>Add New Member</div>
         </ButtonFilled>
       </div>
 
