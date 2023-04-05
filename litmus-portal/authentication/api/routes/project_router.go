@@ -28,5 +28,5 @@ func ProjectRouter(router *gin.Engine, service services.ApplicationService) {
 	router.POST("/add_default_member", rest.AddToDefaultProject(service))
 	router.POST("/add_project_member", rest.AddProjectMember(service))
 	router.POST("/create_project_fk", rest.CreateProjectFK(service))
-	router.POST("/get_default_project", rest.GetDefaultProjectId(service))
+	router.GET("/get_default_project", rest.GetDefaultProjectId(service))
 }
