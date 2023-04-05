@@ -706,3 +706,231 @@ func AddToDefaultProject(service services.ApplicationService) gin.HandlerFunc {
 		c.JSON(200, gin.H{"data": "successful"})
 	}
 }
+
+// DASH: To add the member
+func AddProjectMember(service services.ApplicationService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var member entities.MemberInput
+		err := c.BindJSON(&member)
+		if err != nil {
+			log.Warn(err)
+			c.JSON(utils.ErrorStatusCodes[utils.ErrInvalidRequest], presenter.CreateErrorResponse(utils.ErrInvalidRequest))
+			return
+		}
+		err = validations.RbacValidator(c.MustGet("uid").(string), member.ProjectID,
+			validations.MutationRbacRules["sendInvitation"], string(entities.AcceptedInvitation),
+			service)
+		if err != nil {
+			log.Warn(err)
+			c.JSON(utils.ErrorStatusCodes[utils.ErrUnauthorized],
+				presenter.CreateErrorResponse(utils.ErrUnauthorized))
+			return
+		}
+		// Validating member role
+		if member.Role == nil || (*member.Role != entities.RoleEditor && *member.Role != entities.RoleViewer) {
+			c.JSON(utils.ErrorStatusCodes[utils.ErrInvalidRole], presenter.CreateErrorResponse(utils.ErrInvalidRole))
+			return
+		}
+
+		user, err := service.GetUser(member.UserID)
+
+		if err == mongo.ErrNoDocuments {
+			c.JSON(utils.ErrorStatusCodes[utils.ErrUserNotFound], presenter.CreateErrorResponse(utils.ErrUserNotFound))
+			return
+		} else if err != nil {
+			log.Error(err)
+			c.JSON(utils.ErrorStatusCodes[utils.ErrServerError], presenter.CreateErrorResponse(utils.ErrServerError))
+			return
+		}
+
+		invitation, err := getInvitation(service, member)
+		if err == mongo.ErrNoDocuments {
+			c.JSON(utils.ErrorStatusCodes[utils.ErrProjectNotFound], presenter.CreateErrorResponse(utils.ErrProjectNotFound))
+			return
+		} else if err != nil {
+			log.Error(err)
+			c.JSON(utils.ErrorStatusCodes[utils.ErrServerError], presenter.CreateErrorResponse(utils.ErrServerError))
+			return
+		}
+
+		if invitation == entities.AcceptedInvitation {
+			c.JSON(utils.ErrorStatusCodes[utils.ErrInvalidRequest], gin.H{"message": "user is already a member of this project"})
+			return
+		} else if invitation == entities.PendingInvitation || invitation == entities.DeclinedInvitation || invitation == entities.ExitedProject {
+			err = service.UpdateInvite(member.ProjectID, member.UserID, entities.PendingInvitation, member.Role)
+			if err != nil {
+				log.Error(err)
+				c.JSON(utils.ErrorStatusCodes[utils.ErrServerError], presenter.CreateErrorResponse(utils.ErrServerError))
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"message": "Invitation sent successfully"})
+			return
+		}
+
+		newMember := &entities.Member{
+			UserID:     user.ID,
+			Role:       *member.Role,
+			Invitation: entities.AcceptedInvitation,
+			JoinedAt:   strconv.FormatInt(time.Now().Unix(), 10),
+		}
+
+		err = service.AddMember(member.ProjectID, newMember)
+		if err != nil {
+			log.Error(err)
+			c.JSON(utils.ErrorStatusCodes[utils.ErrServerError], presenter.CreateErrorResponse(utils.ErrServerError))
+			return
+		}
+
+		c.JSON(200, gin.H{"data": types.Member{
+			UserID:        user.ID,
+			UserName:      user.UserName,
+			Name:          user.Name,
+			Role:          entities.MemberRole(newMember.Role),
+			Email:         user.Email,
+			Invitation:    entities.Invitation(newMember.Invitation),
+			JoinedAt:      newMember.JoinedAt,
+			DeactivatedAt: user.DeactivatedAt,
+		}})
+	}
+}
+
+func CreateProjectFK(service services.ApplicationService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var userRequest entities.CreateProjectInput
+		err := c.BindJSON(&userRequest)
+		if err != nil {
+			log.Warn(err)
+			c.JSON(utils.ErrorStatusCodes[utils.ErrInvalidRequest], presenter.CreateErrorResponse(utils.ErrInvalidRequest))
+			return
+		}
+		// checking if project name is empty
+		if userRequest.ProjectName == "" {
+			c.JSON(utils.ErrorStatusCodes[utils.ErrEmptyProjectName], presenter.CreateErrorResponse(utils.ErrEmptyProjectName))
+			return
+		}
+
+		userRequest.UserID = c.MustGet("uid").(string)
+
+		user, err := service.GetUser(userRequest.UserID)
+		if err != nil {
+			log.Error(err)
+			c.JSON(utils.ErrorStatusCodes[utils.ErrServerError], presenter.CreateErrorResponse(utils.ErrServerError))
+			return
+		}
+
+		// Checking for duplicate project name
+		filter := bson.D{{"name", userRequest.ProjectName}}
+		projects, err := service.GetProjects(filter)
+		if err != nil {
+			return
+		}
+
+		if len(projects) > 0 {
+			c.JSON(400, gin.H{"message": "project with name:" + userRequest.ProjectName + " already exists"})
+			return
+		}
+		pID := uuid.Must(uuid.NewRandom()).String()
+
+		// Adding user as project owner in project's member list
+		newMember := &entities.Member{
+			UserID:     user.ID,
+			Role:       entities.RoleOwner,
+			Invitation: entities.AcceptedInvitation,
+			JoinedAt:   strconv.FormatInt(time.Now().Unix(), 10),
+		}
+		var members []*entities.Member
+		members = append(members, newMember)
+		state := "active"
+		newProject := &entities.Project{
+			ID:        pID,
+			Name:      userRequest.ProjectName,
+			Members:   members,
+			State:     &state,
+			CreatedAt: strconv.FormatInt(time.Now().Unix(), 10),
+			UpdatedAt: strconv.FormatInt(time.Now().Unix(), 10),
+			RemovedAt: "",
+		}
+
+		err = service.CreateProject(newProject)
+		if err != nil {
+			log.Error(err)
+			c.JSON(utils.ErrorStatusCodes[utils.ErrServerError], presenter.CreateErrorResponse(utils.ErrServerError))
+			return
+		}
+
+		// Extracting user role
+		role := c.MustGet("role").(string)
+
+		adminuser, err := service.FindUserByUsername("admin")
+		if err != nil {
+			log.Error(err)
+			c.JSON(utils.ErrorStatusCodes[utils.ErrUserNotFound], presenter.CreateErrorResponse(utils.ErrUserNotFound))
+			return
+		}
+
+		adminMember := &entities.Member{
+			UserID:     adminuser.ID,
+			Role:       "Owner",
+			Invitation: entities.AcceptedInvitation,
+			JoinedAt:   strconv.FormatInt(time.Now().Unix(), 10),
+		}
+
+		err = service.AddMember(newProject.ID, adminMember)
+		if err != nil {
+			logrus.Info(err)
+			c.JSON(utils.ErrorStatusCodes[utils.ErrServerError], presenter.CreateErrorResponse(utils.ErrServerError))
+			return
+		}
+
+		var conn *grpc.ClientConn
+		client, conn := utils.GetProjectGRPCSvcClient(conn)
+		err = utils.ProjectInitializer(c, client, pID, role)
+
+		defer func(conn *grpc.ClientConn) {
+			err := conn.Close()
+			if err != nil {
+				log.Errorf("could not close gRPC client connection: %v", err)
+				c.JSON(500, "could not close gRPC client connection")
+				return
+			}
+		}(conn)
+
+		if err != nil {
+			log.Errorf("could not initialize project %v: %v", userRequest.ProjectName, err)
+			c.JSON(500, "could not initialize project")
+			return
+		}
+
+		c.JSON(200, gin.H{"data": newProject.GetProjectOutput()})
+
+	}
+
+}
+
+func GetDefaultProjectId(service services.ApplicationService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		uid := c.MustGet("uid").(string)
+		var res [2]string
+		res[0] = os.Getenv("DEFAULT_PROJECT_ID")
+		// if err != nil {
+		// 	log.Error(err)
+		// 	c.JSON(utils.ErrorStatusCodes[utils.ErrServerError], presenter.CreateErrorResponse(utils.ErrServerError))
+		// 	return
+		// }
+
+		project, err := service.GetProjectByProjectID(res[0])
+		if err != nil {
+			c.JSON(400, gin.H{"message": "Default Project Not available"})
+			return
+		}
+		for _, projectMember := range project.Members {
+			if projectMember.UserID == uid {
+				res[1] = string(projectMember.Role)
+			}
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"data": res,
+		})
+
+	}
+}

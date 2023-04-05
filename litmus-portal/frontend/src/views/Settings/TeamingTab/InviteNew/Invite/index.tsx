@@ -142,7 +142,7 @@ const Invite: React.FC<InviteProps> = ({ handleModal }) => {
 
   const SendInvite = (userid: string, role: string) => {
     setSendInviteLoading(true);
-    fetch(`${config.auth.url}/send_invitation`, {
+    fetch(`${config.auth.url}/add_project_member`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -245,17 +245,14 @@ const Invite: React.FC<InviteProps> = ({ handleModal }) => {
                   <img src="./icons/checkmark.svg" alt="checkmark" />
                   <div className={classes.text}>
                     <Typography className={classes.typo}>
-                      {t('settings.teamingTab.inviteNew.invite.successHeader')}{' '}
                       <strong>
-                        {t(
-                          'settings.teamingTab.inviteNew.invite.successHeaderStrong'
-                        )}
+                        {"Member Added"}
                       </strong>
                     </Typography>
                   </div>
                   <div className={classes.textSecond}>
                     <Typography className={classes.typoSub}>
-                      {t('settings.teamingTab.inviteNew.invite.info')}
+                      {}
                     </Typography>
                   </div>
                   <div
@@ -275,11 +272,8 @@ const Invite: React.FC<InviteProps> = ({ handleModal }) => {
         </>
       ) : (
         <div>
-          <Typography className={classes.Header}>
-            {t('settings.teamingTab.inviteNew.invite.header')}{' '}
-            <strong>
-              {t('settings.teamingTab.inviteNew.invite.headerStrong')}
-            </strong>
+          <Typography className={classes.toolbar}>
+              {"Note: User has to login once to view the list"}
           </Typography>
           <Toolbar className={classes.toolbar}>
             <div
@@ -289,9 +283,7 @@ const Invite: React.FC<InviteProps> = ({ handleModal }) => {
               <div>
                 <Input
                   id="input-with-icon-textfield"
-                  placeholder={t(
-                    'settings.teamingTab.inviteNew.invite.label.someone'
-                  )}
+                  placeholder={"Search Member"}
                   onChange={(e) => {
                     setFilters({
                       search: e.target.value,
@@ -325,7 +317,7 @@ const Invite: React.FC<InviteProps> = ({ handleModal }) => {
                   }}
                 >
                   <div>
-                    {t('settings.teamingTab.inviteNew.invite.button.send')}
+                    {"Add Member"}
                   </div>
                 </ButtonFilled>
               </div>

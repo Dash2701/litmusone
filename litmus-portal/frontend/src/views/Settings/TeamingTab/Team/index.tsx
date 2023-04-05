@@ -11,7 +11,7 @@ import {
   Typography,
   useTheme,
 } from '@material-ui/core';
-import { ButtonOutlined, EditableText, Search } from 'litmus-ui';
+import { ButtonFilled, ButtonOutlined, EditableText, InputField, Search } from 'litmus-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -25,11 +25,16 @@ import * as TabActions from '../../../../redux/actions/tabs';
 import { RootState } from '../../../../redux/reducers';
 import { getToken, getUserId } from '../../../../utils/auth';
 import { getProjectID } from '../../../../utils/getSearchParams';
+import { validateStartEmptySpacing } from '../../../../utils/validate';
 import Invitation from '../Invitation';
 import InviteNew from '../InviteNew';
 import InvitedTable from './invitedTable';
 import MembersTable from './membersTable';
 import useStyles from './styles';
+//DASH
+interface createProject {
+  projectName: string;
+}
 
 interface FilterOptions {
   search: string;
@@ -72,6 +77,7 @@ function tabProps(index: any) {
   };
 }
 
+
 // TeamingTab displays team member table
 const TeamingTab: React.FC = () => {
   const classes = useStyles();
@@ -91,6 +97,25 @@ const TeamingTab: React.FC = () => {
   const [accepted, setAccepted] = useState<Member[]>([]);
   const [notAccepted, setNotAccepted] = useState<Member[]>([]);
   const [activeTab, setActiveTab] = useState<number>(0);
+  
+  //DASH
+  const [createProject, setCreateProject] = React.useState<createProject>({
+    projectName: ''
+  });
+
+  const [error, setError] = useState<string>('');
+  const [open, setOpen] = React.useState(false);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleCreateProject = (prop: keyof createProject) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCreateProject({
+      ...createProject,
+      [prop]: event.target.value,  
+    });
+  };
 
   const invitationTabValue = useSelector(
     (state: RootState) => state.tabNumber.invitation
@@ -103,6 +128,39 @@ const TeamingTab: React.FC = () => {
   const handleChange = (actTab: number) => {
     tabs.changeInvitationTabs(actTab);
   };
+  
+  //DASH
+  // Submit entered data to create endpoint
+  const handleProjectCreation = () => {
+    setLoading(true);
+    fetch(`${config.auth.url}/create_project_fk`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify({
+        project_name: createProject.projectName,
+        user_id: getUserId(),
+      }),
+    })
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      if ('error' in data) {
+        setError(data.error_description as string);
+      } else {
+        window.location.assign(`${process.env.PUBLIC_URL}/home?projectID={$data.ID}&projectRole=Owner`)
+      }
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error(err)
+    });
+};
+ 
+
   const getProjectDetails = () => {
     fetch(`${config.auth.url}/get_project/${projectID}`, {
       method: 'GET',
@@ -220,6 +278,8 @@ const TeamingTab: React.FC = () => {
       });
   };
 
+
+
   useEffect(() => {
     getProjectDetail();
   }, []);
@@ -315,7 +375,7 @@ const TeamingTab: React.FC = () => {
                     {projectOtherCount}
                   </Typography>
                   <Typography>
-                    {t('settings.teamingTab.projectInvite')}
+                    {"Projects you were added"}
                   </Typography>
                 </div>
               </div>
@@ -334,10 +394,10 @@ const TeamingTab: React.FC = () => {
                   className={classes.invitationButton}
                 >
                   <div className={classes.invitationButtonFlex}>
-                    {t('settings.teamingTab.invitations')}
-                    <Typography data-cy="invitationsCount">
+                    {"Create Project"}
+                    {/* <Typography data-cy="invitationsCount">
                       {invitationsCount}
-                    </Typography>
+                    </Typography> */}
                   </div>
                 </ButtonOutlined>
               </div>
@@ -461,7 +521,7 @@ const TeamingTab: React.FC = () => {
                     }
                     {...tabProps(0)}
                   />
-                  <Tab
+                  {/* <Tab
                     data-cy="invitedTab"
                     label={
                       <span
@@ -476,7 +536,7 @@ const TeamingTab: React.FC = () => {
                       </span>
                     }
                     {...tabProps(1)}
-                  />
+                  /> */}
                 </Tabs>
               </Paper>
               <TabPanel value={activeTab} index={0}>
@@ -490,7 +550,7 @@ const TeamingTab: React.FC = () => {
                   open={deleteMemberOpen}
                 />
               </TabPanel>
-              <TabPanel value={activeTab} index={1}>
+              {/* <TabPanel value={activeTab} index={1}>
                 <InvitedTable
                   fetchData={getProjectDetails}
                   notAcceptedFilteredData={notAcceptedFilteredData}
@@ -498,21 +558,54 @@ const TeamingTab: React.FC = () => {
                     showModal();
                   }}
                 />
-              </TabPanel>
+              </TabPanel> */}
               {/* user table */}
             </div>
           </div>
           <div>
             <Paper ref={scrollToRef} className={classes.invitations}>
               <Typography className={classes.inviteHeading}>
-                {t('settings.teamingTab.invitedProject')}
+                {"Provide a Project Name in format \{fk-appid-env\}"}
               </Typography>
               <Typography className={classes.inviteText}>
-                {t(
-                  'settings.teamingTab.invitation.receivedInvitation.receivedHeading'
-                )}
               </Typography>
-              <Invitation getProjectDetail={getProjectDetail} />
+              {/* <Invitation getProjectDetail={getProjectDetail} /> */}
+              <form className={classes.innerPass}>
+              <div data-cy="projectName">
+              <InputField
+              required
+              value={createProject.projectName}
+              onChange={handleCreateProject('projectName')}
+              type="text"
+              label="New Project Name"
+              variant="primary"
+            />
+          </div>
+
+          <div data-cy="create-project" className={classes.buttonModal}>
+            <ButtonFilled
+              data-cy="button"
+              disabled={
+                !(
+                  createProject.projectName.length > 6 &&
+                  !loading
+                )
+              }
+              onClick={handleProjectCreation}
+            >
+              {loading ? (
+                <div>
+                  <Loader size={20} />
+                </div>
+              ) : (
+                <>
+                  Create Project
+                </>
+              )}
+            </ButtonFilled>
+          </div>
+          </form>
+              
             </Paper>
           </div>
         </>

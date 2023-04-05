@@ -1,13 +1,11 @@
+import { Tooltip } from '@material-ui/core';
 import { IconButton } from '@material-ui/core';
 import { ButtonFilled, Modal } from 'litmus-ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { getProjectID, getProjectRole } from '../../../../utils/getSearchParams';
 import Invite from './Invite';
 import useStyles from './styles';
-//DASH
-import { getProjectRole } from '../../../../utils/getSearchParams';
-
-
 
 // NewUserModal displays a modal on creating a new user
 interface InviteNewProps {
@@ -15,6 +13,8 @@ interface InviteNewProps {
   handleOpen: () => void;
   open: boolean;
 }
+
+
 const InviteNew: React.FC<InviteNewProps> = ({
   showModal,
   handleOpen,
@@ -29,9 +29,8 @@ const InviteNew: React.FC<InviteNewProps> = ({
       <div className={classes.button}>
         <ButtonFilled 
           onClick={handleOpen}
-          disabled={userRole === 'Viewer' || userRole === 'Editor'}
           >
-          <div>{t('settings.teamingTab.inviteNew.header')}</div>
+          <div>Add New Member</div>
         </ButtonFilled>
       </div>
 

@@ -101,7 +101,7 @@ const GetStarted: React.FC = () => {
   };
 
 
-  //Dash
+  //DASH:- To add the New User to Default Project
   const addToDefaultProject = () => {
     fetch(`${config.auth.url}/add_default_member`, {
       method: 'POST',
@@ -149,6 +149,7 @@ const GetStarted: React.FC = () => {
         if ('error' in data) {
           isError.current = true;
         } else {
+          //DASH: To add a user to default project
           addToDefaultProject();
         }
       })
@@ -175,7 +176,7 @@ const GetStarted: React.FC = () => {
             handleSubmit(event);
           }
         }}
-      >
+      >  {/* DASH: Disabling */}
         {/* <InputField
           data-cy="inputPassword"
           className={classes.inputValue}
@@ -238,6 +239,7 @@ const GetStarted: React.FC = () => {
               onClick={() => {
                 if (ValidateUser()) {
                   setIsLoading(true);
+                  //DASH: To add to default Project
                   addToDefaultProject();
                 }
               }}

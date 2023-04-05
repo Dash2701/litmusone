@@ -26,7 +26,7 @@ const ProjectInfoContainer = lazy(() => import('../ProjectInfoContainer'));
 const AgentDeployModal = lazy(
   () => import('../../../components/AgentDeployModal')
 );
-const userRole=getProjectRole();
+
 interface AgentConfiguredHomeProps {
   agentCount: number;
 }
@@ -134,7 +134,6 @@ const AgentConfiguredHome: React.FC<AgentConfiguredHomeProps> = ({
                   search: `?projectID=${projectID}&projectRole=${projectRole}`,
                 });
               }}
-              disabled={userRole === 'Viewer'}
             >
               <Typography>
                 {t('homeViews.agentConfiguredHome.noWorkflow.schedule')}

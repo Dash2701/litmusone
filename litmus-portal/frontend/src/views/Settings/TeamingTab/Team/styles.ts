@@ -10,6 +10,14 @@ const useStyles = makeStyles((theme: Theme) => ({
   UMDiv: {
     marginTop: theme.spacing(6.65),
   },
+  //DASH:
+  innerPass: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  buttonModal: {
+    marginTop: theme.spacing(3.75),
+  },
   headerText: {
     fontSize: '1.5625rem',
   },

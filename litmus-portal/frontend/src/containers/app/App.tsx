@@ -49,6 +49,36 @@ const Routes: React.FC = () => {
   const [projectRole, setprojectRole] = useState<string>(projectRoleFromURL);
   const [loading, setLoading] = useState<boolean>(false);
 
+  // DASH :- To Accept login as being view Poejw
+  const getDefaultProjects = () => {
+    setLoading(true);
+    fetch(`${config.auth.url}/get_default_project`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.data) {
+          setprojectID(data.data[0]);    
+          setprojectRole(data.data[1]);      
+          history.push({
+            pathname: `/${baseRoute}`,
+            search: `?projectID=${data.data[0]}&projectRole=${data.data[1]}`,
+          });
+        }
+
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
+  };
+  
+  
   const getOwnerProjects = () => {
     setLoading(true);
     fetch(`${config.auth.url}/get_owner_projects`, {
@@ -77,39 +107,12 @@ const Routes: React.FC = () => {
       });
   };
 
-  // DASH
-  const getDefaultProjects = () => {
-    setLoading(true);
-    fetch(`${config.auth.url}/list_projects`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${getToken()}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.data) {
-          setprojectID(data.data[0]);    
-          setprojectRole('Viewer');      
-          history.push({
-            pathname: `/${baseRoute}`,
-            search: `?projectID=${data.data[0]}&projectRole=Viewer`,
-          });
-        }
-
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
-  };
-
   useEffect(() => {
     if (!((projectID !== '' && projectID !== undefined) || getToken() === '')) {
       //getOwnerProjects();
-       getDefaultProjects();
+      //DASH:- To get Default Project
+      getDefaultProjects();
+
     }
   }, [projectID]);
 
@@ -258,8 +261,7 @@ const Routes: React.FC = () => {
                 path="/myhub/:hubname/:chart/:experiment"
                 component={MyHubExperiment}
               />
-              {/* DASH */}
-              {(projectRole === 'Owner' || projectRole === 'Viewer' || projectRole === 'Editor')? (
+              {projectRole === 'Owner' ? (
                 <Route path="/settings" component={Settings} />
               ) : (
                 <Redirect

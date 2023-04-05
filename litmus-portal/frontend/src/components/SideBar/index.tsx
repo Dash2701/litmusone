@@ -145,7 +145,7 @@ const SideBar: React.FC = () => {
           <ObservabilityIcon />
         </CustomisedListItem>
 
-        {(projectRole === 'Owner' || projectRole === 'Viewer' || projectRole === 'Editor') && (
+        {projectRole === 'Owner' && (
           <CustomisedListItem
             key="settings"
             handleClick={() => {

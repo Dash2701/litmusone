@@ -50,8 +50,7 @@ const Overview: React.FC = () => {
 
   // Local state to display number of data sources
   const [dataSourceCount, setDataSourceCount] = useState<number>(0);
-  //DASH
-  const userRole=getProjectRole();
+
   // Query to check if agent is present or not
   const { data: agentList, loading: agentListLoading } = useQuery<
     Clusters,
@@ -154,8 +153,6 @@ const Overview: React.FC = () => {
                 search: `?projectID=${projectID}&projectRole=${projectRole}`,
               });
             }}
-            //DASH
-            disabled={userRole === 'Viewer'}
           >
             <Typography>
               {t('homeViews.agentConfiguredHome.noWorkflow.schedule')}
@@ -316,8 +313,6 @@ const Overview: React.FC = () => {
                     search: `?projectID=${projectID}&projectRole=${projectRole}`,
                   });
                 }}
-                //DASH
-                disabled={userRole === 'Viewer'}
                 className={classes.infoContainerButton}
               >
                 <Typography>
