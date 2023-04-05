@@ -909,28 +909,49 @@ func CreateProjectFK(service services.ApplicationService) gin.HandlerFunc {
 
 func GetDefaultProjectId(service services.ApplicationService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		uid := c.MustGet("uid").(string)
-		var res [2]string
-		res[0] = os.Getenv("DEFAULT_PROJECT_ID")
-		// if err != nil {
-		// 	log.Error(err)
-		// 	c.JSON(utils.ErrorStatusCodes[utils.ErrServerError], presenter.CreateErrorResponse(utils.ErrServerError))
-		// 	return
-		// }
-
-		project, err := service.GetProjectByProjectID(res[0])
+		uID := c.MustGet("uid").(string)
+		projects, err := service.GetProjectsByUserID(uID, false)
+		if projects == nil {
+			c.JSON(200, gin.H{
+				"message": "No projects found",
+			})
+		}
 		if err != nil {
-			c.JSON(400, gin.H{"message": "Default Project Not available"})
+			log.Error(err)
+			c.JSON(utils.ErrorStatusCodes[utils.ErrServerError], presenter.CreateErrorResponse(utils.ErrServerError))
 			return
 		}
-		for _, projectMember := range project.Members {
-			if projectMember.UserID == uid {
-				res[1] = string(projectMember.Role)
+		var role entities.MemberRole
+		// Fetching user ids of all members from all user's projects
+		for _, project := range projects {
+			if project.ID == os.Getenv("DEFAULT_PROJECT_ID") {
+				for _, member := range project.Members {
+					if uID == member.UserID {
+						role = member.Role
+					}
+
+				}
 			}
+
 		}
-		c.JSON(http.StatusOK, gin.H{
-			"data": res,
-		})
+
+		var res [2]string
+		res[0] = os.Getenv("DEFAULT_PROJECT_ID")
+		var memberRole string
+		if role == entities.RoleOwner {
+			memberRole = "Owner"
+		}
+
+		if role == entities.RoleEditor {
+			memberRole = "Editor"
+		}
+
+		if role == entities.RoleViewer {
+			memberRole = "Viewer"
+		}
+		res[1] = memberRole
+
+		c.JSON(200, gin.H{"data": res})
 
 	}
 }

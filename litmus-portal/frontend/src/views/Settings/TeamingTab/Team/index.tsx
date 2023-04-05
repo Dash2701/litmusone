@@ -568,6 +568,7 @@ const TeamingTab: React.FC = () => {
                 {"Provide a Project Name in format \{fk-appid-env\}"}
               </Typography>
               <Typography className={classes.inviteText}>
+                {"Note: After creation access the project from dropdown in top right corner"}
               </Typography>
               {/* <Invitation getProjectDetail={getProjectDetail} /> */}
               <form className={classes.innerPass}>
