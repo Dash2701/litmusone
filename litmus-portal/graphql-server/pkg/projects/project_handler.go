@@ -48,19 +48,21 @@ func ProjectInitializer(ctx context.Context, projectID string, role string) erro
 
 	defaultHub := model.CreateChaosHubRequest{
 		ProjectID:  projectID,
-		HubName:    "Litmus ChaosHub",
-		RepoURL:    "https://github.com/litmuschaos/chaos-charts",
+		HubName:    "Flipkart Litmus ChaosHub",
+		RepoURL:    os.Getenv("HUB_REPO_URL"),
 		RepoBranch: os.Getenv("HUB_BRANCH_NAME"),
+		IsPrivate:  true,
+		AuthType:   "TOKEN",
 	}
 
-	log.Print("Cloning https://github.com/litmuschaos/chaos-charts")
+	log.Print("Cloning ", defaultHub.RepoURL)
 	//TODO: Remove goroutine after adding hub optimisations
 	go myhub.AddChaosHub(context.Background(), defaultHub)
 
 	_, err := imageRegistryOps.CreateImageRegistry(ctx, projectID, model.ImageRegistryInput{
 		IsDefault:         bl_true,
-		ImageRegistryName: "docker.io",
-		ImageRepoName:     "litmuschaos",
+		ImageRegistryName: "jfrog.fkinternal.com",
+		ImageRepoName:     "docker-external/litmuschaos",
 		ImageRegistryType: "public",
 		SecretName:        nil,
 		SecretNamespace:   nil,

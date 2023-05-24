@@ -266,11 +266,11 @@ const ImageRegistry = () => {
                 <div className={classes.registryInfoDiv}>
                   <Typography className={classes.registryInfoText}>
                     {t('settings.imageRegistry.registry')}
-                    <strong> {t('settings.imageRegistry.dockerio')}</strong>
+                    <strong>jfrog.fkinternal.com</strong>
                   </Typography>
                   <Typography className={classes.registryInfoText}>
                     {t('settings.imageRegistry.repo')}
-                    <strong> {t('settings.imageRegistry.litmus')}</strong>
+                    <strong>docker-external/litmuschaos</strong>
                   </Typography>
                   <Typography className={classes.registryInfoText}>
                     {t('settings.imageRegistry.repoType')}

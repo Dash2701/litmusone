@@ -77,10 +77,10 @@ func ClusterResource(manifest string, namespace string) (*unstructured.Unstructu
 }
 
 /*
-	This function returns the endpoint of the server by which external agents can communicate.
-	The order of generating the endpoint is based on different network type:
-	- Ingress
-	- LoadBalancer > NodePort > ClusterIP
+This function returns the endpoint of the server by which external agents can communicate.
+The order of generating the endpoint is based on different network type:
+- Ingress
+- LoadBalancer > NodePort > ClusterIP
 */
 func GetServerEndpoint(portalScope, agentType string) (string, error) {
 	var (
@@ -96,6 +96,7 @@ func GetServerEndpoint(portalScope, agentType string) (string, error) {
 		LitmusPortalNS    = os.Getenv("LITMUS_PORTAL_NAMESPACE")
 		Ingress           = os.Getenv("INGRESS")
 		IngressName       = os.Getenv("INGRESS_NAME")
+		ServiceLBPort     = os.Getenv("SERVER_SERVICE_NAME_PORT")
 	)
 	ctx := context.TODO()
 	clientset, err := GetGenericK8sClient()
@@ -194,7 +195,9 @@ func GetServerEndpoint(portalScope, agentType string) (string, error) {
 			} else {
 				return "", errors.New("LoadBalancerIP/Hostname not present for loadbalancer service type")
 			}
-			FinalUrl = "http://" + wrapIPV6(IPAddress) + ":" + strconv.Itoa(int(Port)) + "/query"
+			//ServiceLBPort - DASH
+			// FinalUrl = "http://" + wrapIPV6(IPAddress) + ":" + strconv.Itoa(int(Port)) + "/query"
+			FinalUrl = "http://" + wrapIPV6(IPAddress) + ":" + ServiceLBPort + "/query"
 		case "nodeport":
 
 			// Cannot fetch Node Ip Address when ChaosCenter is installed in Namespaced scope
